@@ -54,26 +54,27 @@ void solution_builder() {
 		//cout << "parent ++++++++++++++++++++++++++++++++++++++" << endl;
 		//showMap(parent);
 		//cout << "number inline    >>> " << nodeCue.size() << endl;
-		int oldline = searchCue.size();
+		//int oldline = searchCue.size();
 		//cin >> x;
-		int numDups = 0;
-		int numNew = 0;
-		for (int i = 0; i < 25; i++) {
+		//int numDups = 0;
+		//int numNew = 0;
 
+		for (int i = 0; i < 25; i++) {
 			bitset<26> childSet;
 			childSet = flip_position(i, parent);
 			//cout << "Child" << endl;
 			//showMap(childSet);
+
 			if (solution_array[childSet.to_ulong()].none()) {
 				solution_array[childSet.to_ulong()] = parent;
 				numsolutionFound++;
 				searchCue.push(childSet);
 				//cout << "pushed to cue "<< endl;
-				numNew++;
+				//numNew++;
 			}
 			else {
 				//cout << "dup found=============" << endl;
-				numDups++;
+				//numDups++;
 			}
 		}
 		//cout << "number Duplicates>>> " <<numDups<< endl;
