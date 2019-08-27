@@ -1,0 +1,3 @@
+﻿  Source.cpp
+C:\Users\josia\Documents\GitHub\AI\project 1\Project 1\Project 1\Source.cpp(20,13): warning C4326:  return type of 'main' should be 'int' instead of 'void'
+  Project 1.vcxproj -> C:\Users\josia\Documents\GitHub\AI\project 1\Project 1\Debug\Project 1.exe
