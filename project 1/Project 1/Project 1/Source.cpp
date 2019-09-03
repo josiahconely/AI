@@ -7,15 +7,18 @@
 
 using namespace std;
 
+//index number equals current board state
+//value in array[i] equals next board state toward solution
 bitset<26> solution_array[33554432];
-//search cue
+//cue of new board states found. Children of these board states will be explored
 queue<bitset<26>> searchCue;
 int numsolutionFound;
-//flips current bitset and positon i and returns new bitset
+//flips current bitset at positon i[0-24] and returns new bitset
 bitset<26> flip_position(int i, bitset<26> parent);
-// builds solution map
+// explores all board states starting from solution going backwards
 void solution_builder();
-void showMap(bitset<26>);
+//Visual representation of boardstate
+void showBoard(bitset<26>);
 
 void main() {
 
@@ -39,9 +42,9 @@ void main() {
 
 	/*for (int i = 0; i < 33554432; i++) {
 		cout << "parent" << endl;
-		showMap(solution_array[i]);
+		showBoard(solution_array[i]);
 		cout << "Child" << endl;
-		showMap(bitset<26>(i));
+		showBoard(bitset<26>(i));
 	}*/
 }
 
@@ -52,7 +55,7 @@ void solution_builder() {
 		searchCue.pop();
 
 		//cout << "parent ++++++++++++++++++++++++++++++++++++++" << endl;
-		//showMap(parent);
+		//showBoard(parent);
 		//cout << "number inline    >>> " << nodeCue.size() << endl;
 		//int oldline = searchCue.size();
 		//cin >> x;
@@ -63,10 +66,10 @@ void solution_builder() {
 			bitset<26> childSet;
 			childSet = flip_position(i, parent);
 			//cout << "Child" << endl;
-			//showMap(childSet);
+			//showBoard(childSet);
 
-			if (solution_array[childSet.to_ulong()].none()) {
-				solution_array[childSet.to_ulong()] = parent;
+			if (solution_array[(int)childSet.to_ulong()].none()) {
+				solution_array[(int)childSet.to_ulong()] = parent;
 				numsolutionFound++;
 				searchCue.push(childSet);
 				//cout << "pushed to cue "<< endl;
@@ -87,7 +90,8 @@ void solution_builder() {
 bitset<26> flip_position(int i, bitset<26> parent) {
 	bitset<26> childSet;
 	childSet = parent;
-	//cout << "position change " << i;
+	
+	//changes positions at columns
 	int j = i;
 	j += 5;
 	while (j < 25) {
@@ -100,6 +104,8 @@ bitset<26> flip_position(int i, bitset<26> parent) {
 		childSet.flip(j);
 		j -= 5;
 	}
+
+	//changes positions at rows
 	if (i >= 0 && i < 5) {
 		for (int t = 0; t < 5; t++) {
 			childSet.flip(t);
@@ -133,7 +139,7 @@ bitset<26> flip_position(int i, bitset<26> parent) {
 }
 
 
-void showMap(bitset<26> bits) {
+void showBoard(bitset<26> bits) {
 	int p = 0;
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 5; j++) {
