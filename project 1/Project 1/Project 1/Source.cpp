@@ -22,11 +22,6 @@ void showBoard(bitset<26>);
 
 void main() {
 
-	//Ensures all bitsets are zero: 
-	for (int i = 0; i < 33554432; i++) {
-		solution_array[i].reset();
-	}
-
 	numsolutionFound = 0;
 
 	//Goal solutions are initialized with 26th bit flipped on to avoid being pushed to the search cue
@@ -36,6 +31,7 @@ void main() {
 	//The search cue is initialized with the two goal states
 	searchCue.push(bitset<26>(0));
 	searchCue.push(bitset<26>(33554431));
+
 	//Finds all solutions and build solution array
 	solution_builder();
 	cout << "number of soulutions found " << numsolutionFound << endl;
@@ -50,17 +46,17 @@ void main() {
 
 void solution_builder() {
 	while (!searchCue.empty()) {
-		//cout << "number inline    >>> " << nodeCue.size() << endl;
+		cout << "number inline    >>> " << searchCue.size() << endl;
 		bitset<26> parent = searchCue.front();
 		searchCue.pop();
-
-		//cout << "parent ++++++++++++++++++++++++++++++++++++++" << endl;
-		//showBoard(parent);
-		//cout << "number inline    >>> " << nodeCue.size() << endl;
-		//int oldline = searchCue.size();
-		//cin >> x;
-		//int numDups = 0;
-		//int numNew = 0;
+		int x;
+		cout << "parent ++++++++++++++++++++++++++++++++++++++" << endl;
+		showBoard(parent);
+		cout << "number inline    >>> " << searchCue.size() << endl;
+		int oldline = searchCue.size();
+		cin >> x;
+		int numDups = 0;
+		int numNew = 0;
 
 		for (int i = 0; i < 25; i++) {
 			bitset<26> childSet;
@@ -73,16 +69,16 @@ void solution_builder() {
 				numsolutionFound++;
 				searchCue.push(childSet);
 				//cout << "pushed to cue "<< endl;
-				//numNew++;
+				numNew++;
 			}
 			else {
 				//cout << "dup found=============" << endl;
-				//numDups++;
+				numDups++;
 			}
 		}
-		//cout << "number Duplicates>>> " <<numDups<< endl;
-		//cout << "number New       >>> " <<numNew << endl;
-		//cout << "number inline old>>> " <<oldline<< endl;
+		cout << "number Duplicates>>> " <<numDups<< endl;
+		cout << "number New       >>> " <<numNew << endl;
+		cout << "number inline old>>> " <<oldline<< endl;
 	}
 }
 
