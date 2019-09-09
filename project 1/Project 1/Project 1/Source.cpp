@@ -1,9 +1,6 @@
 #include <iostream>
 #include <bitset>
-#include <string>
 #include <queue>
-#include <istream>
-#include <fstream>
 #include <unordered_set>
 #include <vector>
 #include <time.h> 
@@ -12,7 +9,7 @@ using namespace std;
 
 //index number equals current board state
 //value in array[i] equals next board state toward solution
-bitset<26> solution_array[33554433];
+bitset<26> solution_array[335544330];
 //cue of new board states found. Children of these board states will be explored
 queue<bitset<26>> searchCue;
 int numsolutionFound;
@@ -33,14 +30,14 @@ int findFlipPos(bitset<26>, bitset<26>);
 
 void main() {
 	srand(time(0));
-
+	cout << "Preparing Game..." << endl;
 	//Goal solutions are initialized with 26th bit flipped on to avoid being pushed to the search cue
 	solution_array[0].set(25);
 	solution_array[33554431].set(25);
 
 	//The search cue is initialized with the two goal states
 	bitset<26> empty;
-	searchCue.push(bitset<26>(0));
+	searchCue.push(bitset<26>(33554432));
 	searchCue.push(bitset<26>(33554431));
 
 	//Finds all solutions and build solution array
@@ -49,7 +46,6 @@ void main() {
 	solution_array[1082431] = bitset<26>(0);
 	//plays game
 	cout << "Game Ready! Want to play?" << endl;
-
 	while (playGame()) {
 		cout << "thanks for playing!" << endl;
 	}
@@ -66,12 +62,7 @@ void solution_builder() {
 			childSet = flip_position(i, parent);
 
 			if (solution_array[childSet.to_ulong()].none()) {
-				if (parent != bitset<26>(0)) {
-					solution_array[childSet.to_ulong()] = parent;
-				}
-				else {
-					solution_array[childSet.to_ulong()] = bitset<26>(33554432);
-				}
+				solution_array[childSet.to_ulong()] = parent;
 				searchCue.push(childSet);
 				solveable.push_back(childSet);
 			}
@@ -105,7 +96,6 @@ void printList(bitset<26> start) {
 	
 }
 
-
 void printCompList(bitset<26> start) {
 	bitset<26> end;
 	end.set(25);
@@ -120,7 +110,7 @@ void printCompList(bitset<26> start) {
 	cout << endl;
 }
 
-
+//returns the position fliped when comparing parent and child
 int findFlipPos(bitset<26> parent, bitset<26> child) {
 	int column;
 	int row;
@@ -149,11 +139,6 @@ int findFlipPos(bitset<26> parent, bitset<26> child) {
 	column++;
 	return  row*5 + column;
 }
-
-
-
-
-
 
 bitset<26> flip_position(int i, bitset<26> parent) {
 	bitset<26> childSet;
@@ -199,10 +184,6 @@ bitset<26> flip_position(int i, bitset<26> parent) {
 			childSet.flip(t);
 		}
 	}
-	//cout << "parent" << endl;
-	//showMap(parent);
-	//cout << "Child" << endl;
-	//showMap(childSet);
 	return childSet;
 }
 
