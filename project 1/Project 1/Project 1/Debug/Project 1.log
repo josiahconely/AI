@@ -1,3 +1,4 @@
 ﻿  Source.cpp
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\project 1\Project 1\Project 1\Source.cpp(23,13): warning C4326:  return type of 'main' should be 'int' instead of 'void'
-  Project 1.vcxproj -> C:\Users\Josiah's Laptop\Documents\GitHub\AI\project 1\Project 1\Debug\Project 1.exe
+C:\Users\josia\Documents\GitHub\AI\project 1\Project 1\Project 1\Source.cpp(34,13): warning C4326:  return type of 'main' should be 'int' instead of 'void'
+C:\Users\josia\Documents\GitHub\AI\project 1\Project 1\Project 1\Source.cpp(35,12): warning C4244:  'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Project 1.vcxproj -> C:\Users\josia\Documents\GitHub\AI\project 1\Project 1\Debug\Project 1.exe
