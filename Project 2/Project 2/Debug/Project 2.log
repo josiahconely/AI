@@ -1,0 +1,9 @@
+﻿  solution.cpp
+  Source.cpp
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(38,13): warning C4326:  return type of 'main' should be 'int' instead of 'void'
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(40,20): error C2107:  illegal index, indirection not allowed
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(41,2): error C2059:  syntax error: ','
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(43,1): error C2059:  syntax error: '}'
+  Generating Code...
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(43,1): error C2143:  syntax error: missing ';' before '}'
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\solution.cpp(4): error C4716:  'area': must return a value
