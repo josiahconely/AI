@@ -123,11 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\Josiah%27s Laptop\Documents\GitHub\AI\Project 2\Project 2\solution.cpp" />
     <ClCompile Include="..\..\..\..\..\..\Josiah%27s Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\Josiah%27s Laptop\Documents\GitHub\AI\Project 2\Project 2\solution.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

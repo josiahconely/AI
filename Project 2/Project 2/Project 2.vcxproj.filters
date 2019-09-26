@@ -18,13 +18,5 @@
     <ClCompile Include="..\..\..\..\..\..\Josiah%27s Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\Josiah%27s Laptop\Documents\GitHub\AI\Project 2\Project 2\solution.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\Josiah%27s Laptop\Documents\GitHub\AI\Project 2\Project 2\solution.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,9 +1,11 @@
-﻿  solution.cpp
-  Source.cpp
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(38,13): warning C4326:  return type of 'main' should be 'int' instead of 'void'
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(40,20): error C2107:  illegal index, indirection not allowed
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(41,2): error C2059:  syntax error: ','
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(43,1): error C2059:  syntax error: '}'
-  Generating Code...
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(43,1): error C2143:  syntax error: missing ';' before '}'
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\solution.cpp(4): error C4716:  'area': must return a value
+﻿  Source.cpp
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(77,13): warning C4326:  return type of 'main' should be 'int' instead of 'void'
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(78,12): warning C4244:  'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(192,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(211,25): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(226,25): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(347,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(359,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(370,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(376,20): warning C4018:  '<': signed/unsigned mismatch
+  Project 2.vcxproj -> C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Debug\Project 2.exe
