@@ -16,6 +16,7 @@ using namespace std;
 #define NUMBER_OF_CLASSES 12
 #define NUMBER_OF_CLASS_TYPES 8
 #define NUMBER_OF_ROOMS 7
+#define MUTATION_PROB .01
 
 							// 0      1        2      3       4      5       6       7
 string ClassesNames[] = { "CS101","CS201","CS191","CS291","CS303","CS341","CS449","CS461"};
@@ -72,6 +73,8 @@ void printClass(Class);
 int findIndexStrArr(string[], string);
 vector<double> L2Normalization(vector<double>);
 vector<double> GenerateNomalizationFromPool(SecheduleGeneration);
+SecheduleGeneration makeNewGeneration(SecheduleGeneration);
+int getBuildingID(int);
 
 
 void main() {
@@ -108,6 +111,11 @@ void main() {
 	ClassDemand[11] = 40;
 	
 	//Testing
+
+
+	
+
+
 	Class TestClass1 = GenerateRandClass(0);
 	printClass(TestClass1);
 	SchoolSchedule TestSchedule1 = GenerateRandSchedule();
@@ -129,29 +137,33 @@ Class GenerateRandClass(int ClassesScheduled_ID) {
 	randClass.instructorID = 0 + rand() % (NUMBER_INSTRUCTORS);
 	randClass.roomAssignmentID = 0 + rand() % (NUMBER_OF_ROOMS);
 	randClass.time_slotID = 0 + rand() % (NUMBER_OF_TIMESLOTS);
+	randClass.BuildingID = getBuildingID(randClass.roomAssignmentID);
 
-						//   0             1        2              3            4                5               6
-	//string roomArr[] = { "Haag 301", "Haag 206", "Royall 204", "Katz 209", "Flarsheim 310", "Flarsheim 260", "Bloch 0009" };
-							//    0      1        2         3           4
-	//string BuildingArr[] = { "Haag", "Royall", "Katz", "Flarsheim", "Bloch" };
-
-	if (randClass.roomAssignmentID == 0 || randClass.roomAssignmentID == 1) {
-		randClass.BuildingID = 0;
-	}
-	else if (randClass.roomAssignmentID == 2) {
-		randClass.BuildingID = 1;
-	}
-	else if (randClass.roomAssignmentID == 3) {
-		randClass.BuildingID = 2;
-	}
-	else if (randClass.roomAssignmentID == 4 || randClass.roomAssignmentID == 5) {
-		randClass.BuildingID = 3;
-	}
-	else if (randClass.roomAssignmentID == 6) {
-		randClass.BuildingID = 4;
-	}
 	return randClass;
 }
+
+int getBuildingID(int roomID) {
+	int buildingID;
+	if (roomID == 0 || roomID == 1) {
+		buildingID = 0;
+	}
+	else if (roomID == 2) {
+		buildingID = 1;
+	}
+	else if (roomID == 3) {
+		buildingID = 2;
+	}
+	else if (roomID == 4 || roomID == 5) {
+		buildingID = 3;
+	}
+	else if (roomID == 6) {
+		buildingID = 4;
+	}
+	return buildingID;
+}
+
+
+
 
 // Generates random schedule
 SchoolSchedule  GenerateRandSchedule() {
@@ -385,3 +397,89 @@ void printClass(Class class_) {
 	cout << "numStudents  " << class_.numStudents << endl<<endl;
 }
 
+
+
+SecheduleGeneration makeNewGeneration(SecheduleGeneration Gen1) {
+	SecheduleGeneration Gen2;
+
+	//get probability distrobution for current generation 
+	vector<double> probDistrobution = GenerateNomalizationFromPool(Gen1);
+	for (int i = 0; i < SCHEDULE_POOL_SIZE; i++) {
+		
+		//select 2 schedules for crossover
+		double j = rand() / double(RAND_MAX);
+		int idx = 0;
+		while (probDistrobution[idx] < j) {
+			idx++;
+		}
+		SchoolSchedule parent1 = Gen1.population[idx];
+		j = rand() / double(RAND_MAX);;
+		idx = 0;
+		while (probDistrobution[idx] < j) {
+			idx++;
+		}
+		SchoolSchedule parent2 = Gen1.population[idx];
+
+		//Generate random crossover point for mating of two parents
+		int crossOver = rand() % (NUMBER_OF_CLASSES);
+
+		//crossover
+		SchoolSchedule newSchedule;
+		for (int j = 0; j < crossOver; j++) {
+			newSchedule.classes.push_back(parent1.classes[j]);
+		}
+		for (int j = crossOver; j < NUMBER_OF_CLASSES; j++) {
+			newSchedule.classes.push_back(parent2.classes[j]);
+		}
+
+		// push back to new generation
+		Gen2.population.push_back(newSchedule);
+	}
+
+	// Mutate the generation 
+	MUTATION_PROB;
+	for (int i = 0; i < Gen2.population.size(); i++) {
+		for (int j = 0; j < Gen2.population[i].classes.size(); j++) {
+
+			double doMutation = rand() / double(RAND_MAX);
+			if (doMutation < MUTATION_PROB){
+				Gen2.population[i].classes[j].roomAssignmentID;
+				Gen2.population[i].classes[j].BuildingID = getBuildingID(Gen2.population[i].classes[j].roomAssignmentID);
+			}
+
+
+			doMutation = rand() / double(RAND_MAX);
+			if (doMutation < MUTATION_PROB) {
+				Gen2.population[i].classes[j].instructorID;
+			}
+
+			doMutation = rand() / double(RAND_MAX);
+			if (doMutation < MUTATION_PROB) {
+				Gen2.population[i].classes[j].time_slotID;
+			}
+
+			
+			
+		}
+
+	}
+
+
+
+
+	return Gen2;
+}
+
+
+/*Crossover/mutation: It'll probably be simplest to assign each course its own column in a table,
+which will not change, and then select sections of table (i.e. columns) for the crossover section.
+Select a random (uniform) division point to make the split, with at least 1 column from each table
+surviving to the next generation. For mutation, give each table entry a small probability--0.01 or
+so, no more than 0.05--of being replaced with a randomly-selected element from that population (rooms, instructors, etc).
+
+Report the average fitness and best fitness of each generation, until the best fitness in the
+population increases by less than 0.2% for 3 consecutive generations. Report the best schedule 
+you find. Your program should report any constraints that are violated (multiple courses in the
+same room, too many courses by 1 instructor, etc.) The room preferences for CS 101/191 and
+CS 201/291 are just that—preferences--so it’s OK if they’re violated. 
+(Better if they’re not, but the fitness function will take care of that.)*/
