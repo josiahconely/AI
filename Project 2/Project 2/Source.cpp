@@ -16,29 +16,30 @@ using namespace std;
 #define NUMBER_OF_CLASSES 12
 #define NUMBER_OF_CLASS_TYPES 8
 #define NUMBER_OF_ROOMS 7
-#define MUTATION_PROB .01
+#define MUTATION_PROB .05
 
-							// 0      1        2      3       4      5       6       7
-string ClassesNames[] = { "CS101","CS201","CS191","CS291","CS303","CS341","CS449","CS461"};
-						//	0			1		2	  	3			4
-string instrctorsArr[] = { "Hare", "Bingham", "Kuhail", "Mitchell", "Rao"};
-					//   0             1        2              3            4                5               6
+
+//DATA CONTAINERS////////////////////////////////
+// 0      1        2      3       4      5       6       7
+string ClassesNames[] = { "CS101","CS201","CS191","CS291","CS303","CS341","CS449","CS461" };
+//	0			1		2	  	3			4
+string instrctorsArr[] = { "Hare", "Bingham", "Kuhail", "Mitchell", "Rao" };
+//   0             1        2              3            4                5               6
 string roomArr[] = { "Haag 301", "Haag 206", "Royall 204", "Katz 209", "Flarsheim 310", "Flarsheim 260", "Bloch 0009" };
-					   //  0      1        2         3           4
+//  0      1        2         3           4
 string BuildingArr[] = { "Haag", "Royall", "Katz", "Flarsheim", "Bloch" };
 // military time
-int time_slots[] = { 10,11,12,13,14,15,16}; // 7 total
+int time_slots[] = { 10,11,12,13,14,15,16 }; // 7 total
+//classes to schedule			0		1		2		3		4		5		6		7		8		9		10		11
+string ClassesScheduled[] = { "CS101","CS101","CS201","CS201","CS191","CS191","CS291","CS291","CS303","CS341","CS449","CS461" };
+// records relationship between class index and demand
+map <int, int> ClassDemand;
 // records relationship between instrctors and classes taught
 map <string, set<int>> instructorsClasses;
 // records relationship between Room and Capacity
 map <string, int > RoomCap;
-//classes to schedule
-//								0		1		2		3		4		5		6		7		8		9		10		11
-string ClassesScheduled[]= {"CS101","CS101","CS201","CS201","CS191","CS191","CS291","CS291","CS303","CS341","CS449","CS461"};
-// records relationship between class index and demand
-map <int,int> ClassDemand;
 
-// Class container
+// CLASS CONTAINERS//////////////////////////////
 class Class {
 public:
 	int classNameID;
@@ -50,81 +51,108 @@ public:
 	//void set_values(int, int);
 	//int area(void);
 };
-
 // schedule container
 class SchoolSchedule {
 public:
 	vector<Class> classes;
 };
-
 //Generation Container
 class SecheduleGeneration {
 public:
 	vector<SchoolSchedule> population;
 };
+struct GenEvaluators {
+	double avgFittness;
+	double bestFittness;
+};
 
-//Functions
+//FUNCTIONS//////////////////////////////////////
+//Generates firt generation
 Class GenerateRandClass(int);
 SchoolSchedule  GenerateRandSchedule();
 SecheduleGeneration   GenerateRandScheduleGeneration();
+//Score
 double ScoreCalc(SchoolSchedule);
 double Adjacent(int, int, int, int, double);
-void printClass(Class);
-int findIndexStrArr(string[], string);
+GenEvaluators fittnessEvaluator(SecheduleGeneration);
+//mutate functions
 vector<double> L2Normalization(vector<double>);
 vector<double> GenerateNomalizationFromPool(SecheduleGeneration);
 SecheduleGeneration makeNewGeneration(SecheduleGeneration);
+//helper functions 
+void printClass(Class);
+int findIndexStrArr(string[], string);
 int getBuildingID(int);
+
+
 
 
 void main() {
 	srand(time(0));
 
-	// defines classes that teaches teach
-	instructorsClasses["Hare"] = {0,1,3,4,6,7};
-	instructorsClasses["Bingham"] = {0,1,2,3,6};
-	instructorsClasses["Kuhail"] = {4,5};
-	instructorsClasses["Mitchell"] = {2,3,4,5};
-	instructorsClasses["Rao"] = {3,4,5,7};
-	
-	//Defines room Capacity
-	RoomCap["Haag 301"] = (70);
-	RoomCap["Haag 206"] = (30);
-	RoomCap["Royall 204"] = (70);
-	RoomCap["Katz 209"] = (50);
-	RoomCap["Flarsheim 310"] = (80);
-	RoomCap["Flarsheim 260"] = (25);
-	RoomCap["Bloch 0009"] = (30);
-	
-	//defines class demand 
-	ClassDemand[0] = 40;
-	ClassDemand[1] = 25;
-	ClassDemand[2] = 30;
-	ClassDemand[3] = 30;
-	ClassDemand[4] = 60;
-	ClassDemand[5] = 20;
-	ClassDemand[6] = 40;
-	ClassDemand[7] = 20;
-	ClassDemand[8] = 50;
-	ClassDemand[9] = 40;
-	ClassDemand[10] = 55;
-	ClassDemand[11] = 40;
-	
-	//Testing
+	//initializeData
+	{
+		// defines classes that teaches teach
+		instructorsClasses["Hare"] = { 0,1,3,4,6,7 };
+		instructorsClasses["Bingham"] = { 0,1,2,3,6 };
+		instructorsClasses["Kuhail"] = { 4,5 };
+		instructorsClasses["Mitchell"] = { 2,3,4,5 };
+		instructorsClasses["Rao"] = { 3,4,5,7 };
+
+		//Defines room Capacity
+		RoomCap["Haag 301"] = (70);
+		RoomCap["Haag 206"] = (30);
+		RoomCap["Royall 204"] = (70);
+		RoomCap["Katz 209"] = (50);
+		RoomCap["Flarsheim 310"] = (80);
+		RoomCap["Flarsheim 260"] = (25);
+		RoomCap["Bloch 0009"] = (30);
+
+		//defines class demand 
+		ClassDemand[0] = 40;
+		ClassDemand[1] = 25;
+		ClassDemand[2] = 30;
+		ClassDemand[3] = 30;
+		ClassDemand[4] = 60;
+		ClassDemand[5] = 20;
+		ClassDemand[6] = 40;
+		ClassDemand[7] = 20;
+		ClassDemand[8] = 50;
+		ClassDemand[9] = 40;
+		ClassDemand[10] = 55;
+		ClassDemand[11] = 40;
+	}
 
 
-	
 
 
-	Class TestClass1 = GenerateRandClass(0);
-	printClass(TestClass1);
-	SchoolSchedule TestSchedule1 = GenerateRandSchedule();
-	//for (int i = 0; i < TestSchedule1.classes.size(); i++) {
-	//	printClass(TestSchedule1.classes[i]);
-	//}
-	//cout << ScoreCalc(TestSchedule1);
-	SecheduleGeneration  Gen1 = GenerateRandScheduleGeneration();
-	vector<double> normalizedscores = GenerateNomalizationFromPool(Gen1);
+
+	/*Report the average fitnessand best fitness of each generation, until the best fitness in the
+		population increases by less than 0.2 % for 3 consecutive generations.Report the best schedule
+		you find.Your program should report any constraints that are violated(multiple courses in the
+			same room, too many courses by 1 instructor, etc.) The room preferences for CS 101 / 191 and
+		CS 201 / 291 are just that—preferences--so it’s OK if they’re violated.
+		(Better if they’re not, but the fitness function will take care of that.) * /
+	*/
+	SecheduleGeneration  gen1 = GenerateRandScheduleGeneration();
+	GenEvaluators eval = fittnessEvaluator(gen1);
+	cout << "Gen 1 Avg: " << eval.avgFittness << endl;
+	cout << "Gen 1 Bst: " << eval.bestFittness << endl;
+	GenEvaluators evalChild;
+	evalChild.avgFittness = 0;
+	evalChild.bestFittness = .001;
+	int indx = 1;
+
+	while (true) {//evalChild.bestFittness/ eval.bestFittness > .8) {
+
+		SecheduleGeneration gen2 = makeNewGeneration(gen1);
+		indx++;
+		evalChild = fittnessEvaluator(gen2);
+		cout << "Gen " << indx << " Avg: " << evalChild.avgFittness << endl;
+		cout << "Gen " << indx << " Bst: " << evalChild.bestFittness << endl;
+		eval = fittnessEvaluator(gen1);
+		gen1 = gen2;
+	}
 }
 
 
@@ -132,7 +160,7 @@ void main() {
 Class GenerateRandClass(int ClassesScheduled_ID) {
 
 	Class randClass;
-	randClass.classNameID = findIndexStrArr(ClassesNames,ClassesScheduled[ClassesScheduled_ID]);
+	randClass.classNameID = findIndexStrArr(ClassesNames, ClassesScheduled[ClassesScheduled_ID]);
 	randClass.numStudents = ClassDemand[ClassesScheduled_ID];
 	randClass.instructorID = 0 + rand() % (NUMBER_INSTRUCTORS);
 	randClass.roomAssignmentID = 0 + rand() % (NUMBER_OF_ROOMS);
@@ -162,9 +190,6 @@ int getBuildingID(int roomID) {
 	return buildingID;
 }
 
-
-
-
 // Generates random schedule
 SchoolSchedule  GenerateRandSchedule() {
 	SchoolSchedule Schedule;
@@ -175,14 +200,13 @@ SchoolSchedule  GenerateRandSchedule() {
 }
 
 // generates initial pool of schedules
-SecheduleGeneration	GenerateRandScheduleGeneration (){
+SecheduleGeneration	GenerateRandScheduleGeneration() {
 	SecheduleGeneration pool;
 	for (int i = 0; i < SCHEDULE_POOL_SIZE; i++) {
 		pool.population.push_back(GenerateRandSchedule());
 	}
 	return pool;
 }
-
 
 double ScoreCalc(SchoolSchedule ClassSchedule) {
 
@@ -308,14 +332,14 @@ double ScoreCalc(SchoolSchedule ClassSchedule) {
 		ClassSchedule.classes[3].BuildingID, ClassSchedule.classes[7].BuildingID, score);
 
 	// score plus delta change on percentage calulations to avoid compound percentage distortion
-	score = score + a + b + c + d + e + f + g + h + AA +BB +CC;
+	score = score + a + b + c + d + e + f + g + h + AA + BB + CC;
 
 	return score;
 }
 
-					     //  0      1        2         3           4
+//  0      1        2         3           4
 //string BuildingArr[] = { "Haag", "Royall", "Katz", "Flarsheim", "Bloch" };
-double Adjacent(int time_1, int time_2, int Building_1, int Building_2 , double score) {
+double Adjacent(int time_1, int time_2, int Building_1, int Building_2, double score) {
 	double scoreINIT = score;
 	//Courses are scheduled for adjacent times : +5 %   
 	if ((time_1 == time_2 + 1) || (time_1 == time_2 - 1)) {
@@ -323,7 +347,8 @@ double Adjacent(int time_1, int time_2, int Building_1, int Building_2 , double 
 		//if these courses are scheduled for adjacent times, and Are in the same building : +5 points
 		if (Building_1 == Building_2) {
 			score += 5;
-		}else{
+		}
+		else {
 			//1 is in Katz and the other isn’t : -3 %
 			if (Building_1 == 2 && Building_2 != 2) {
 				score = .97 * score;
@@ -382,7 +407,7 @@ vector<double> L2Normalization(vector<double> scores) {
 	for (int i = 1; i < normalized.size(); i++) {
 		cumulativeDistribution += normalized[i];
 		normalized[i] = cumulativeDistribution;
-		
+
 	}
 	return normalized;
 }
@@ -394,10 +419,8 @@ void printClass(Class class_) {
 	cout << "Building ID  " << class_.BuildingID << " : Building  : " << BuildingArr[class_.BuildingID] << endl;
 	cout << "Room     ID  " << class_.roomAssignmentID << " : Room      : " << roomArr[class_.roomAssignmentID] << endl;
 	cout << "time_slotID  " << class_.time_slotID << " : time      : " << time_slots[class_.time_slotID] << endl;
-	cout << "numStudents  " << class_.numStudents << endl<<endl;
+	cout << "numStudents  " << class_.numStudents << endl << endl;
 }
-
-
 
 SecheduleGeneration makeNewGeneration(SecheduleGeneration Gen1) {
 	SecheduleGeneration Gen2;
@@ -405,18 +428,30 @@ SecheduleGeneration makeNewGeneration(SecheduleGeneration Gen1) {
 	//get probability distrobution for current generation 
 	vector<double> probDistrobution = GenerateNomalizationFromPool(Gen1);
 	for (int i = 0; i < SCHEDULE_POOL_SIZE; i++) {
-		
+
 		//select 2 schedules for crossover
 		double j = rand() / double(RAND_MAX);
 		int idx = 0;
-		while (probDistrobution[idx] < j) {
-			idx++;
+		if (idx < SCHEDULE_POOL_SIZE) {
+			while (probDistrobution[idx] < j) {
+				if (idx < SCHEDULE_POOL_SIZE - 1) { idx++; }
+				else { break; }
+			}
+		}
+		else {
+			idx = SCHEDULE_POOL_SIZE - 1;
 		}
 		SchoolSchedule parent1 = Gen1.population[idx];
 		j = rand() / double(RAND_MAX);;
 		idx = 0;
-		while (probDistrobution[idx] < j) {
-			idx++;
+		if (idx < SCHEDULE_POOL_SIZE) {
+			while (probDistrobution[idx] < j) {
+				if (idx < SCHEDULE_POOL_SIZE - 1) { idx++; }
+				else { break; }
+			}
+		}
+		else {
+			idx = SCHEDULE_POOL_SIZE - 1;
 		}
 		SchoolSchedule parent2 = Gen1.population[idx];
 
@@ -437,12 +472,11 @@ SecheduleGeneration makeNewGeneration(SecheduleGeneration Gen1) {
 	}
 
 	// Mutate the generation 
-	MUTATION_PROB;
 	for (int i = 0; i < Gen2.population.size(); i++) {
 		for (int j = 0; j < Gen2.population[i].classes.size(); j++) {
 
 			double doMutation = rand() / double(RAND_MAX);
-			if (doMutation < MUTATION_PROB){
+			if (doMutation < MUTATION_PROB) {
 				Gen2.population[i].classes[j].roomAssignmentID;
 				Gen2.population[i].classes[j].BuildingID = getBuildingID(Gen2.population[i].classes[j].roomAssignmentID);
 			}
@@ -457,18 +491,32 @@ SecheduleGeneration makeNewGeneration(SecheduleGeneration Gen1) {
 			if (doMutation < MUTATION_PROB) {
 				Gen2.population[i].classes[j].time_slotID;
 			}
-
-			
-			
 		}
-
 	}
-
-
-
-
 	return Gen2;
 }
+
+GenEvaluators fittnessEvaluator(SecheduleGeneration gen) {
+	GenEvaluators fittness;
+	fittness.avgFittness = 0;
+	fittness.bestFittness = 0;
+	double sumOfScores = 0;
+	double Score;
+
+	for (int i = 0; i < SCHEDULE_POOL_SIZE; i++) {
+		Score = ScoreCalc(gen.population[i]);
+		if (Score > fittness.bestFittness) {
+			fittness.bestFittness = Score;
+		}
+		sumOfScores += Score;
+	}
+
+	fittness.avgFittness = sumOfScores / SCHEDULE_POOL_SIZE;
+	return fittness;
+}
+
+
+
 
 
 /*Crossover/mutation: It'll probably be simplest to assign each course its own column in a table,
@@ -478,8 +526,8 @@ surviving to the next generation. For mutation, give each table entry a small pr
 so, no more than 0.05--of being replaced with a randomly-selected element from that population (rooms, instructors, etc).
 
 Report the average fitness and best fitness of each generation, until the best fitness in the
-population increases by less than 0.2% for 3 consecutive generations. Report the best schedule 
+population increases by less than 0.2% for 3 consecutive generations. Report the best schedule
 you find. Your program should report any constraints that are violated (multiple courses in the
 same room, too many courses by 1 instructor, etc.) The room preferences for CS 101/191 and
-CS 201/291 are just that—preferences--so it’s OK if they’re violated. 
+CS 201/291 are just that—preferences--so it’s OK if they’re violated.
 (Better if they’re not, but the fitness function will take care of that.)*/
