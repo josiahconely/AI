@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <string>
 #include <queue>
 #include <istream>
@@ -7,9 +7,9 @@
 #include <set>
 #include <ctime>
 #include <algorithm>
-
 using namespace std;
 
+//DATA CONTAINERS////////////////////////////////////////////////////
 #define NUMBER_INSTRUCTORS 5
 #define NUMBER_OF_TIMESLOTS 7
 #define SCHEDULE_POOL_SIZE 700
@@ -18,19 +18,13 @@ using namespace std;
 #define NUMBER_OF_ROOMS 7
 #define MUTATION_PROB .05
 
-
-//DATA CONTAINERS////////////////////////////////
-// 0      1        2      3       4      5       6       7
 string ClassesNames[] = { "CS101","CS201","CS191","CS291","CS303","CS341","CS449","CS461" };
-//	0			1		2	  	3			4
 string instrctorsArr[] = { "Hare", "Bingham", "Kuhail", "Mitchell", "Rao" };
-//   0             1        2              3            4                5               6
 string roomArr[] = { "Haag 301", "Haag 206", "Royall 204", "Katz 209", "Flarsheim 310", "Flarsheim 260", "Bloch 0009" };
-//  0      1        2         3           4
 string BuildingArr[] = { "Haag", "Royall", "Katz", "Flarsheim", "Bloch" };
 // military time
 int time_slots[] = { 10,11,12,13,14,15,16 }; // 7 total
-//classes to schedule			0		1		2		3		4		5		6		7		8		9		10		11
+//classes to schedule			
 string ClassesScheduled[] = { "CS101","CS101","CS201","CS201","CS191","CS191","CS291","CS291","CS303","CS341","CS449","CS461" };
 // records relationship between class index and demand
 map <int, int> ClassDemand;
@@ -39,7 +33,7 @@ map <string, set<int>> instructorsClasses;
 // records relationship between Room and Capacity
 map <string, int > RoomCap;
 
-// CLASS CONTAINERS//////////////////////////////
+// CLASSES//////////////////////////////////////////////////////////
 class Class {
 public:
 	int classNameID;
@@ -48,8 +42,6 @@ public:
 	int time_slotID;
 	int roomAssignmentID;
 	int BuildingID;
-	//void set_values(int, int);
-	//int area(void);
 };
 // schedule container
 class SchoolSchedule {
@@ -64,17 +56,18 @@ public:
 struct GenEvaluators {
 	double avgFittness;
 	double bestFittness;
+	int idex_of_best;
 };
 
-//FUNCTIONS//////////////////////////////////////
-//Generates firt generation
+//FUNCTIONS//////////////////////////////////////////////////////////
+//Generates initial pool of schedules
 Class GenerateRandClass(int);
 SchoolSchedule  GenerateRandSchedule();
 SecheduleGeneration   GenerateRandScheduleGeneration();
-//Score
-double ScoreCalc(SchoolSchedule);
+//Calculates Score of each Schedule
+double ScoreCalc(SchoolSchedule, bool);               //per schedule
 double Adjacent(int, int, int, int, double);
-GenEvaluators fittnessEvaluator(SecheduleGeneration);
+GenEvaluators fittnessEvaluator(SecheduleGeneration); //per generation
 //mutate functions
 vector<double> L2Normalization(vector<double>);
 vector<double> GenerateNomalizationFromPool(SecheduleGeneration);
@@ -83,8 +76,6 @@ SecheduleGeneration makeNewGeneration(SecheduleGeneration);
 void printClass(Class);
 int findIndexStrArr(string[], string);
 int getBuildingID(int);
-
-
 
 
 void main() {
@@ -123,17 +114,7 @@ void main() {
 		ClassDemand[11] = 40;
 	}
 
-
-
-
-
-	/*Report the average fitnessand best fitness of each generation, until the best fitness in the
-		population increases by less than 0.2 % for 3 consecutive generations.Report the best schedule
-		you find.Your program should report any constraints that are violated(multiple courses in the
-			same room, too many courses by 1 instructor, etc.) The room preferences for CS 101 / 191 and
-		CS 201 / 291 are just that—preferences--so it’s OK if they’re violated.
-		(Better if they’re not, but the fitness function will take care of that.) * /
-	*/
+	//First Gen creation
 	SecheduleGeneration  gen1 = GenerateRandScheduleGeneration();
 	GenEvaluators eval = fittnessEvaluator(gen1);
 	cout << "Gen 1 Avg: " << eval.avgFittness << endl;
@@ -142,9 +123,9 @@ void main() {
 	evalChild.avgFittness = 0;
 	evalChild.bestFittness = .001;
 	int indx = 1;
-
-	while (true) {//evalChild.bestFittness/ eval.bestFittness > .8) {
-
+	int less_than2PercentIcreace = 0;
+	do {
+		eval = evalChild;
 		SecheduleGeneration gen2 = makeNewGeneration(gen1);
 		indx++;
 		evalChild = fittnessEvaluator(gen2);
@@ -152,11 +133,24 @@ void main() {
 		cout << "Gen " << indx << " Bst: " << evalChild.bestFittness << endl;
 		eval = fittnessEvaluator(gen1);
 		gen1 = gen2;
+		if (evalChild.bestFittness / eval.bestFittness < 1.02) {
+			less_than2PercentIcreace++;
+		}
+		else {
+			less_than2PercentIcreace = 0;
+		}
+	} while (less_than2PercentIcreace <= 35);
+
+	//print the best of last genereation
+	for (int i = 0; i < NUMBER_OF_CLASSES; i++) {
+		printClass(gen1.population[evalChild.idex_of_best].classes[i]);
 	}
+
+	//prints violations
+	double score = ScoreCalc(gen1.population[evalChild.idex_of_best], true);
+	cout << "Final Score: " << score << endl;
 }
 
-
-//generates random classes for sechedule initailization
 Class GenerateRandClass(int ClassesScheduled_ID) {
 
 	Class randClass;
@@ -170,27 +164,6 @@ Class GenerateRandClass(int ClassesScheduled_ID) {
 	return randClass;
 }
 
-int getBuildingID(int roomID) {
-	int buildingID;
-	if (roomID == 0 || roomID == 1) {
-		buildingID = 0;
-	}
-	else if (roomID == 2) {
-		buildingID = 1;
-	}
-	else if (roomID == 3) {
-		buildingID = 2;
-	}
-	else if (roomID == 4 || roomID == 5) {
-		buildingID = 3;
-	}
-	else if (roomID == 6) {
-		buildingID = 4;
-	}
-	return buildingID;
-}
-
-// Generates random schedule
 SchoolSchedule  GenerateRandSchedule() {
 	SchoolSchedule Schedule;
 	for (int i = 0; i < NUMBER_OF_CLASSES; i++) {
@@ -199,7 +172,6 @@ SchoolSchedule  GenerateRandSchedule() {
 	return Schedule;
 }
 
-// generates initial pool of schedules
 SecheduleGeneration	GenerateRandScheduleGeneration() {
 	SecheduleGeneration pool;
 	for (int i = 0; i < SCHEDULE_POOL_SIZE; i++) {
@@ -208,7 +180,7 @@ SecheduleGeneration	GenerateRandScheduleGeneration() {
 	return pool;
 }
 
-double ScoreCalc(SchoolSchedule ClassSchedule) {
+double ScoreCalc(SchoolSchedule ClassSchedule, bool printViolations) {
 
 	double score = 0;
 
@@ -218,27 +190,50 @@ double ScoreCalc(SchoolSchedule ClassSchedule) {
 		InstructorClassCount[i] = 0;
 	}
 
+	if (printViolations) {
+		cout << endl << "VOLATIONS:" << endl;
+	}
 	//Per class calculations
 	for (int i = 0; i < ClassSchedule.classes.size(); i++) {
-		//For each course that is taught by an instructor who can teach it : +3
+		//For each course that is taught by an instructor who can teach it : +3 
 		if (instructorsClasses[instrctorsArr[ClassSchedule.classes[i].instructorID]].find(ClassSchedule.classes[i].classNameID)
 			!= instructorsClasses[instrctorsArr[ClassSchedule.classes[i].instructorID]].end()) {
 			score += 3;
 		}
-		//For each course that is in a room large enough to accommodate it : +5
+		else {
+			if (printViolations) {
+				cout << "CLASS " << i << ": >> " << ClassesNames[ClassSchedule.classes[i].classNameID]
+					<< " course not taught by an instructor who can teach it INSTRUCTOR " << instrctorsArr[ClassSchedule.classes[i].instructorID] << endl;
+			}
+		}
+		//For each course that is in a room large enough to accommodate it : +5 
 		if (ClassSchedule.classes[i].numStudents <= RoomCap[roomArr[ClassSchedule.classes[i].roomAssignmentID]]) {
 			score += 5;
 		}
-		//Room capacity is no more than twice the expected enrollment : +2
+		else {
+			if (printViolations) {
+				cout << "CLASS " << i << ": >> " << ClassesNames[ClassSchedule.classes[i].classNameID] << " room "
+					<< roomArr[ClassSchedule.classes[i].roomAssignmentID] << " not large enough to accommodate class. NUM/CAP: "
+					<< ClassSchedule.classes[i].numStudents << "/" << RoomCap[roomArr[ClassSchedule.classes[i].roomAssignmentID]] << endl;
+			}
+		}
+		//Room capacity is no more than twice the expected enrollment : +2 
 		if (!(RoomCap[roomArr[ClassSchedule.classes[i].roomAssignmentID]] >= 2 * ClassSchedule.classes[i].numStudents)) {
 			score += 2;
+		}
+		else {
+			if (printViolations) {
+				cout << "CLASS " << i << ": >> " << ClassesNames[ClassSchedule.classes[i].classNameID] << " Room "
+					<< roomArr[ClassSchedule.classes[i].roomAssignmentID] << " capacity is more than twice the expected enrollment NUM/CAP: "
+					<< ClassSchedule.classes[i].numStudents << "/" << RoomCap[roomArr[ClassSchedule.classes[i].roomAssignmentID]] << endl;
+			}
 		}
 		//Tracks instructor class count
 		InstructorClassCount[ClassSchedule.classes[i].instructorID] += 1;
 
-		//For each course that does not have the same instructor teaching another course at the same time : +5
+		//For each course that does not have the same instructor teaching another course at the same time : +5 
 		bool Instructor_time_conflict = false;
-		for (int j = i + 1; j < ClassSchedule.classes.size(); j++) {
+		for (int j = 0; j < ClassSchedule.classes.size(); j++) {
 			if (j != i) {
 				if (ClassSchedule.classes[i].time_slotID == ClassSchedule.classes[j].time_slotID) {
 					if (ClassSchedule.classes[i].instructorID == ClassSchedule.classes[j].instructorID) {
@@ -250,8 +245,14 @@ double ScoreCalc(SchoolSchedule ClassSchedule) {
 		if (!Instructor_time_conflict) {
 			score += 5;
 		}
+		else {
+			if (printViolations) {
+				cout << "CLASS " << i << ": >> " << ClassesNames[ClassSchedule.classes[i].classNameID] << " Instructor teaching another course at the same time TIME/INSTRUCTOR: "
+					<< time_slots[ClassSchedule.classes[i].time_slotID] << " / " << instrctorsArr[ClassSchedule.classes[i].instructorID] << endl;
+			}
+		}
 
-		//For each course that is the only course scheduled in that room at that time : +5
+		//For each course that is the only course scheduled in that room at that time : +5 
 		bool room_time_conflict = false;
 		for (int j = i + 1; j < ClassSchedule.classes.size(); j++) {
 			if (j != i) {
@@ -265,20 +266,35 @@ double ScoreCalc(SchoolSchedule ClassSchedule) {
 		if (!room_time_conflict) {
 			score += 5;
 		}
+		else {
+			if (printViolations) {
+				cout << "CLASS " << i << ": >> " << ClassesNames[ClassSchedule.classes[i].classNameID] << " Not only course scheduled in that room at that time TIME/ROOM: "
+					<< time_slots[ClassSchedule.classes[i].time_slotID] << " / " << roomArr[ClassSchedule.classes[i].roomAssignmentID] << endl;
+			}
+		}
 	}
 	//Per Schedule Calulations
-	//each schedule that has the same instructor teaching more than 4 courses : -5 per course over 4 
+	//each schedule that has the same instructor teaching more than 4 courses : -5 per course over 4  
 	for (int i = 0; i < NUMBER_INSTRUCTORS; i++) {
 		if (InstructorClassCount[i] > 4) {
 			score -= 5;
+			if (printViolations) {
+				cout << "INSTRUCTOR " << instrctorsArr[i] << " teaching more than 4 courses: "
+					<< InstructorClassCount[i] << " CLASSES" << endl;
+			}
 		}
 	}
 
-	//For each schedule that has Rao or Mitchell teaching more courses than Hare or Bingham : -5 % to total fitness score. (Same number of courses is OK.)
+	//For each schedule that has Rao or Mitchell teaching more courses than Hare or Bingham : -5 % to total fitness score. (Same number of courses is OK.) 
 	double AA = 0;
-	if ((InstructorClassCount[3] > InstructorClassCount[0]) || (InstructorClassCount[3] > InstructorClassCount[1]) || (InstructorClassCount[4] > InstructorClassCount[0]) || (InstructorClassCount[4] > InstructorClassCount[1])) {
+	if ((InstructorClassCount[3] > InstructorClassCount[0]) || (InstructorClassCount[3] > InstructorClassCount[1]) ||
+		(InstructorClassCount[4] > InstructorClassCount[0]) || (InstructorClassCount[4] > InstructorClassCount[1])) {
 		AA = (.95 * score) - score;
+		if (printViolations) {
+			cout << "Rao or Mitchell teaching more courses than Hare or Bingham " << endl;
+		}
 	}
+
 
 	//CS 101 and CS 191 || CS 201 and CS 291.  apply these rules to those pairs of courses :
 	//								0		1		2		3		4		5		6		7		8		9		10		11
@@ -286,15 +302,19 @@ double ScoreCalc(SchoolSchedule ClassSchedule) {
 
 	//Courses are scheduled for same time : -10 % to score CS101 CS191
 	double BB = 0;
-	if ((ClassSchedule.classes[0].time_slotID == ClassSchedule.classes[4].time_slotID) || (ClassSchedule.classes[0].time_slotID == ClassSchedule.classes[5].time_slotID) ||
-		(ClassSchedule.classes[1].time_slotID == ClassSchedule.classes[4].time_slotID) || (ClassSchedule.classes[1].time_slotID == ClassSchedule.classes[5].time_slotID)) {
+	if ((ClassSchedule.classes[0].time_slotID == ClassSchedule.classes[4].time_slotID) ||
+		(ClassSchedule.classes[0].time_slotID == ClassSchedule.classes[5].time_slotID) ||
+		(ClassSchedule.classes[1].time_slotID == ClassSchedule.classes[4].time_slotID) ||
+		(ClassSchedule.classes[1].time_slotID == ClassSchedule.classes[5].time_slotID)) {
 		BB = (.90 * score) - score;
 	}
 
 	//Courses are scheduled for same time : -10 % to score CS201 CS291
 	double CC = 0;
-	if ((ClassSchedule.classes[2].time_slotID == ClassSchedule.classes[6].time_slotID) || (ClassSchedule.classes[2].time_slotID == ClassSchedule.classes[7].time_slotID) ||
-		(ClassSchedule.classes[3].time_slotID == ClassSchedule.classes[6].time_slotID) || (ClassSchedule.classes[3].time_slotID == ClassSchedule.classes[7].time_slotID)) {
+	if ((ClassSchedule.classes[2].time_slotID == ClassSchedule.classes[6].time_slotID) ||
+		(ClassSchedule.classes[2].time_slotID == ClassSchedule.classes[7].time_slotID) ||
+		(ClassSchedule.classes[3].time_slotID == ClassSchedule.classes[6].time_slotID) ||
+		(ClassSchedule.classes[3].time_slotID == ClassSchedule.classes[7].time_slotID)) {
 		CC = (.90 * score) - score;
 	}
 
@@ -303,9 +323,9 @@ double ScoreCalc(SchoolSchedule ClassSchedule) {
 		if these courses are scheduled for adjacent times, and
 			Are in the same building : +5 points
 			Are both on the quad(Haag, Royall, Flarsheim) : no modification
-			1 is in Katz and the other isn’t : -3 %
-			1 is in Bloch and the other isn’t : -3 %
-			(Yes, if one’s in Katz and the other’s in Bloch, that’s - 6 %) */
+			1 is in Katz and the other isnï¿½t : -3 %
+			1 is in Bloch and the other isnï¿½t : -3 %
+			(Yes, if oneï¿½s in Katz and the otherï¿½s in Bloch, thatï¿½s - 6 %) */
 
 	double a = Adjacent(ClassSchedule.classes[0].time_slotID, ClassSchedule.classes[4].time_slotID,
 		ClassSchedule.classes[0].BuildingID, ClassSchedule.classes[4].BuildingID, score);
@@ -337,8 +357,6 @@ double ScoreCalc(SchoolSchedule ClassSchedule) {
 	return score;
 }
 
-//  0      1        2         3           4
-//string BuildingArr[] = { "Haag", "Royall", "Katz", "Flarsheim", "Bloch" };
 double Adjacent(int time_1, int time_2, int Building_1, int Building_2, double score) {
 	double scoreINIT = score;
 	//Courses are scheduled for adjacent times : +5 %   
@@ -349,11 +367,11 @@ double Adjacent(int time_1, int time_2, int Building_1, int Building_2, double s
 			score += 5;
 		}
 		else {
-			//1 is in Katz and the other isn’t : -3 %
+			//1 is in Katz and the other isnï¿½t : -3 %
 			if (Building_1 == 2 && Building_2 != 2) {
 				score = .97 * score;
 			}
-			//	1 is in Bloch and the other isn’t : -3 %
+			//	1 is in Bloch and the other isnï¿½t : -3 %
 			if (Building_1 == 4 && Building_2 != 4) {
 				score = .97 * score;
 			}
@@ -363,20 +381,31 @@ double Adjacent(int time_1, int time_2, int Building_1, int Building_2, double s
 	return score - scoreINIT;
 }
 
-int findIndexStrArr(string arr[], string target) {
-	for (int i = 0; i < NUMBER_OF_CLASS_TYPES; i++) {
-		if (arr[i] == target) {
-			return i;
+GenEvaluators fittnessEvaluator(SecheduleGeneration gen) {
+	GenEvaluators fittness;
+	fittness.avgFittness = 0;
+	fittness.bestFittness = 0;
+	double sumOfScores = 0;
+	double Score;
+
+	for (int i = 0; i < SCHEDULE_POOL_SIZE; i++) {
+		Score = ScoreCalc(gen.population[i], false);
+		if (Score > fittness.bestFittness) {
+			fittness.bestFittness = Score;
+			fittness.idex_of_best = i;
 		}
+		sumOfScores += Score;
 	}
-	return -1;
+
+	fittness.avgFittness = sumOfScores / SCHEDULE_POOL_SIZE;
+	return fittness;
 }
 
 vector<double> GenerateNomalizationFromPool(SecheduleGeneration Gen) {
 	//collects scores for each schedule
 	vector<double> RawScores;
 	for (int i = 0; i < Gen.population.size(); i++) {
-		RawScores.push_back(ScoreCalc(Gen.population[i]));
+		RawScores.push_back(ScoreCalc(Gen.population[i], false));
 	}
 
 	// passes the scores to the normalizer 
@@ -410,16 +439,6 @@ vector<double> L2Normalization(vector<double> scores) {
 
 	}
 	return normalized;
-}
-
-void printClass(Class class_) {
-
-	cout << "classNam ID  " << class_.classNameID << " : Class     : " << ClassesNames[class_.classNameID] << endl;
-	cout << "instructorID " << class_.instructorID << " : Instructor: " << instrctorsArr[class_.instructorID] << endl;
-	cout << "Building ID  " << class_.BuildingID << " : Building  : " << BuildingArr[class_.BuildingID] << endl;
-	cout << "Room     ID  " << class_.roomAssignmentID << " : Room      : " << roomArr[class_.roomAssignmentID] << endl;
-	cout << "time_slotID  " << class_.time_slotID << " : time      : " << time_slots[class_.time_slotID] << endl;
-	cout << "numStudents  " << class_.numStudents << endl << endl;
 }
 
 SecheduleGeneration makeNewGeneration(SecheduleGeneration Gen1) {
@@ -496,38 +515,41 @@ SecheduleGeneration makeNewGeneration(SecheduleGeneration Gen1) {
 	return Gen2;
 }
 
-GenEvaluators fittnessEvaluator(SecheduleGeneration gen) {
-	GenEvaluators fittness;
-	fittness.avgFittness = 0;
-	fittness.bestFittness = 0;
-	double sumOfScores = 0;
-	double Score;
-
-	for (int i = 0; i < SCHEDULE_POOL_SIZE; i++) {
-		Score = ScoreCalc(gen.population[i]);
-		if (Score > fittness.bestFittness) {
-			fittness.bestFittness = Score;
-		}
-		sumOfScores += Score;
+int getBuildingID(int roomID) {
+	int buildingID;
+	if (roomID == 0 || roomID == 1) {
+		buildingID = 0;
 	}
-
-	fittness.avgFittness = sumOfScores / SCHEDULE_POOL_SIZE;
-	return fittness;
+	else if (roomID == 2) {
+		buildingID = 1;
+	}
+	else if (roomID == 3) {
+		buildingID = 2;
+	}
+	else if (roomID == 4 || roomID == 5) {
+		buildingID = 3;
+	}
+	else if (roomID == 6) {
+		buildingID = 4;
+	}
+	return buildingID;
 }
 
+void printClass(Class class_) {
+	cout << endl;
+	cout << "classNam ID  " << class_.classNameID << " : Class     : " << ClassesNames[class_.classNameID] << endl;
+	cout << "instructorID " << class_.instructorID << " : Instructor: " << instrctorsArr[class_.instructorID] << endl;
+	cout << "Building ID  " << class_.BuildingID << " : Building  : " << BuildingArr[class_.BuildingID] << endl;
+	cout << "Room     ID  " << class_.roomAssignmentID << " : Room      : " << roomArr[class_.roomAssignmentID] << endl;
+	cout << "time_slotID  " << class_.time_slotID << " : time      : " << time_slots[class_.time_slotID] << endl;
+	cout << "numStudents  " << class_.numStudents << endl;
+}
 
-
-
-
-/*Crossover/mutation: It'll probably be simplest to assign each course its own column in a table,
-which will not change, and then select sections of table (i.e. columns) for the crossover section.
-Select a random (uniform) division point to make the split, with at least 1 column from each table
-surviving to the next generation. For mutation, give each table entry a small probability--0.01 or
-so, no more than 0.05--of being replaced with a randomly-selected element from that population (rooms, instructors, etc).
-
-Report the average fitness and best fitness of each generation, until the best fitness in the
-population increases by less than 0.2% for 3 consecutive generations. Report the best schedule
-you find. Your program should report any constraints that are violated (multiple courses in the
-same room, too many courses by 1 instructor, etc.) The room preferences for CS 101/191 and
-CS 201/291 are just that—preferences--so it’s OK if they’re violated.
-(Better if they’re not, but the fitness function will take care of that.)*/
+int findIndexStrArr(string arr[], string target) {
+	for (int i = 0; i < NUMBER_OF_CLASS_TYPES; i++) {
+		if (arr[i] == target) {
+			return i;
+		}
+	}
+	return -1;
+}

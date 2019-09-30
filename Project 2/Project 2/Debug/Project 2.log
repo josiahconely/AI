@@ -1,13 +1,13 @@
 ﻿  Source.cpp
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(90,13): warning C4326:  return type of 'main' should be 'int' instead of 'void'
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(91,12): warning C4244:  'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(222,20): warning C4018:  '<': signed/unsigned mismatch
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(241,25): warning C4018:  '<': signed/unsigned mismatch
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(256,25): warning C4018:  '<': signed/unsigned mismatch
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(378,20): warning C4018:  '<': signed/unsigned mismatch
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(390,20): warning C4018:  '<': signed/unsigned mismatch
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(401,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(81,13): warning C4326:  return type of 'main' should be 'int' instead of 'void'
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(82,12): warning C4244:  'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(197,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(236,21): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(257,25): warning C4018:  '<': signed/unsigned mismatch
 C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(407,20): warning C4018:  '<': signed/unsigned mismatch
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(475,20): warning C4018:  '<': signed/unsigned mismatch
-C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(476,21): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(419,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(430,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(436,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(494,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Project 2\Source.cpp(495,21): warning C4018:  '<': signed/unsigned mismatch
   Project 2.vcxproj -> C:\Users\Josiah's Laptop\Documents\GitHub\AI\Project 2\Debug\Project 2.exe
